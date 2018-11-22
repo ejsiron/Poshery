@@ -17,7 +17,7 @@ Get-CimDistantAssociation.ps1 [-CimInstance] <CimInstance>
 
 Traces CIM associations from the supplied instance, searching for an instance with the name specified in ResultClass.
 
-Instead of following each path to its end before moving to the next, the search moves laterally. It checks all first level associations first, then all second-level associations, etc. until it reaches the specified maximum depth.
+Instead of following each path to its end before moving to the next, the search moves laterally. It checks all first-level associations, then all second-level associations, etc. until it finds no more unchecked associations or reaches the specified maximum depth.
 
 Due to the behavior of the native CIM cmdlets, searches proceed radially. They do not distinguish between "antecedent" and "descendant" associations. To prevent infinite recursion, the search will skip an instance whose associations have already been checked.
 
@@ -124,6 +124,8 @@ If the search path that leads to a given CIM instance contains any of the items 
 
 An entry can be a single class name, such as "Win32_OperatingSystem" or it can be a path with multiple components. Separate components with a "/". Example: "Win32_OperatingSystem/Win32_ComputerSystem".
 
+The search uses regular expressions to match. Affix a slash (/) to the end of class names to avoid accidental partial matches. Example: "Win32_OperatingSystem/".
+
 ```yaml
 Type: String[]
 Required: False
@@ -135,7 +137,7 @@ Accept wildcard characters: False
 
 ### -PathOnly
 
-Instead of the discovered instances, returns the path(s) the search used to find them.
+Instead of the discovered instances, returns the path(s) the search followed to find them.
 
 Results are displayed in the format "SourceClassName/FirstAssociation/SecondAssociation/..."
 
