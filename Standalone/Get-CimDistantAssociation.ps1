@@ -197,6 +197,10 @@ begin
 
 process
 {
+	if($CimInstance.CimClass.CimSystemProperties.Namespace -eq 'root/cimv2')
+	{
+		Write-Warning -Message 'Association queries in root/cimv2 tend to hang indefinitely. Use CTRL+C to cancel'
+	}
 	$InstancePacks = @(New-CrumbedInstance -ParentBreadCrumb '' -CimInstance $CimInstance)
 	$DepthCounter = 0
 	do
