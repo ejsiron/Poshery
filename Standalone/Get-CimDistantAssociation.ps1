@@ -29,8 +29,8 @@ Results are displayed in the format "SourceClassName/FirstAssociation/SecondAsso
 Only retrieve values for key properties. No effect if PathOnly is also specified.
 .NOTES
 Author: Eric Siron
-Version 1.0, November 23, 2018
 Released under MIT license
+Version 1.0.1, November 26, 2018
 .INPUTS
 Microsoft.Management.Infrastructure.CimInstance and String
 .OUTPUTS
@@ -38,30 +38,21 @@ Microsoft.Management.Infrastructure.CimInstance[] or String[]
 .EXAMPLE
 PS C:\> $VMHost = (Get-CimInstance -Namespace root/virtualization/v2 -ClassName Msvm_ComputerSystem)[0]
 PS C:\> Get-CimDistantAssociation.ps1 -CimInstance $VMHost -ResultClassName Msvm_EthernetSwitchPortVlanSettingData
-
 On a Hyper-V host, loads the management operating system instance, then finds all instances of Msvm_EthernetSwitchPortVlanSettingData within an association distance of 10.
-
 .EXAMPLE
 PS C:\> $VMHost = (Get-CimInstance -Namespace root/virtualization/v2 -ClassName Msvm_ComputerSystem)[0]
 PS C:\> Get-CimDistantAssociation.ps1 -CimInstance $VMHost -ResultClassName Msvm_EthernetSwitchPortVlanSettingData -MaxDistance 6
-
 On a Hyper-V host, loads the management operating system instance, then finds all instances of Msvm_EthernetSwitchPortVlanSettingData within an association distance of 6.
-
 .EXAMPLE
 PS C:\> $VMHost = (Get-CimInstance -Namespace root/virtualization/v2 -ClassName Msvm_ComputerSystem)[0]
 PS C:\> Get-CimDistantAssociation.ps1 -CimInstance $VMHost -ResultClassName Msvm_EthernetSwitchPortVlanSettingData -MaxDistance 6 -ExcludeBranches 'Msvm_ResourcePool' -PathOnly
-
 On a Hyper-V host, loads the management operating system instance, then finds the paths of all instances of Msvm_EthernetSwitchPortVlanSettingData within an association distance of 6. Avoids any branch containing an instance named "Msvm_ResourcePool".
-
 .EXAMPLE
 PS C:\> $VMHost = (Get-CimInstance -Namespace root/virtualization/v2 -ClassName Msvm_ComputerSystem)[0]
 PS C:\> Get-CimDistantAssociation.ps1 -CimInstance $VMHost -ResultClassName Msvm_EthernetSwitchPortVlanSettingData -MaxDistance 6 -ExcludeBranches 'Msvm_ResourcePool/Msvm_VirtualEthernetSwitch', 'Msvm_InstalledEthernetSwitchExtension/Msvm_EthernetSwitchFeatureCapabilities' -PathOnly -MaxResults 1
-
 On a Hyper-V host, loads the management operating system instance, then finds the paths of the first instance of Msvm_EthernetSwitchPortVlanSettingData within an association distance of 6. Avoids any branch containing "Msvm_ResourcePool/Msvm_VirtualEthernetSwitch" or "Msvm_InstalledEthernetSwitchExtension/Msvm_EthernetSwitchFeatureCapabilities".
-
 .LINK
 https://github.com/ejsiron/Poshery/blob/master/Docs/Get-CimDistantAssociation.md
-
 .LINK
 Get-CimInstance: https://docs.microsoft.com/en-us/powershell/module/cimcmdlets/get-ciminstance
 #>
@@ -163,10 +154,10 @@ begin
 					$ThisClassName = $AssociatedInstance.CimClass.CimClassName
 					Write-Progress -Activity ('Checking associated instances of "{0}"' -f $InstancePack.CimInstance.CimClass.CimClassName) -CurrentOperation $ThisClassName -Status ('Searching {0} instances at depth {1}' -f $InstancePacks.Count, $DepthCounter) -PercentComplete (($DepthInstanceCounter / $InstancePacks.Count) * 100)
 					$ThisCrumbedInstance = New-CrumbedInstance -CimInstance $AssociatedInstance -ParentBreadCrumb $InstancePack.BreadCrumb
-					Write-Debug -Message ('Parent: {0}' -f $ThisCrumbedInstance.BreadCrumb)
-					Write-Debug -Message $ThisCrumbedInstance.BreadCrumb
-					if ($ThisClassName -eq $Needle)
+					Write-Debug -Message ('This instance: {0}' -f $ThisCrumbedInstance.BreadCrumb)
+					if ($ThisClassName -eq $Needle -and -not $KeyHashes.Contains($ThisCrumbedInstance.Hash))
 					{
+						$OutNull = $KeyHashes.Add($ThisCrumbedInstance.Hash)
 						if ($PathOnly)
 						{
 							$OutNull = $FoundInstances.Add($ThisCrumbedInstance.BreadCrumb)
@@ -191,22 +182,20 @@ begin
 				}
 			}
 		}
-		$Children.ToArray()
+		$Children
 	}
 }
 
 process
 {
-	if($CimInstance.CimClass.CimSystemProperties.Namespace -eq 'root/cimv2')
-	{
-		Write-Warning -Message 'Association queries in root/cimv2 tend to hang indefinitely. Use CTRL+C to cancel'
-	}
 	$InstancePacks = @(New-CrumbedInstance -ParentBreadCrumb '' -CimInstance $CimInstance)
 	$DepthCounter = 0
 	do
 	{
 		$DepthCounter++
 		$InstancePacks = Get-CrumbedChildren -InstancePacks $InstancePacks -Needle $ResultClassName -Depth $DepthCounter -MaxResults $MaxResults -KeyOnly $KeyOnly.ToBool()
+		Write-Host 'call returned'
+		if ($InstancePacks.GetType().FullName -eq 'System.Management.Automation.PSCustomObject') { $InstancePacks = , @($InstancePacks) }
 	} while ($InstancePacks -and $InstancePacks.Count -and ($MaxDistance -eq 0 -or $DepthCounter -le $MaxDistance))
 	$FoundInstances
 }
