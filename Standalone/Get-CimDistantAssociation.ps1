@@ -194,7 +194,6 @@ process
 	{
 		$DepthCounter++
 		$InstancePacks = Get-CrumbedChildren -InstancePacks $InstancePacks -Needle $ResultClassName -Depth $DepthCounter -MaxResults $MaxResults -KeyOnly $KeyOnly.ToBool()
-		Write-Host 'call returned'
 		if ($InstancePacks.GetType().FullName -eq 'System.Management.Automation.PSCustomObject') { $InstancePacks = , @($InstancePacks) }
 	} while ($InstancePacks -and $InstancePacks.Count -and ($MaxDistance -eq 0 -or $DepthCounter -le $MaxDistance))
 	$FoundInstances
