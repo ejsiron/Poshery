@@ -29,8 +29,8 @@ Results are displayed in the format "SourceClassName/FirstAssociation/SecondAsso
 Only retrieve values for key properties. No effect if PathOnly is also specified.
 .NOTES
 Author: Eric Siron
+Version 1.0.1a, November 30, 2018
 Released under MIT license
-Version 1.0.1, November 26, 2018
 .INPUTS
 Microsoft.Management.Infrastructure.CimInstance and String
 .OUTPUTS
@@ -172,7 +172,7 @@ begin
 						}
 						if ($MaxResults -gt 0 -and $FoundInstances.Count -ge $MaxResults)
 						{
-							return
+							return @()
 						}
 					}
 					elseif (-not (MatchInCollection -Haystack $ThisCrumbedInstance.BreadCrumb -Needles $ExcludeBranches))
@@ -194,7 +194,7 @@ process
 	{
 		$DepthCounter++
 		$InstancePacks = Get-CrumbedChildren -InstancePacks $InstancePacks -Needle $ResultClassName -Depth $DepthCounter -MaxResults $MaxResults -KeyOnly $KeyOnly.ToBool()
-		if ($InstancePacks.GetType().FullName -eq 'System.Management.Automation.PSCustomObject') { $InstancePacks = , @($InstancePacks) }
+		if ($InstancePacks -and $InstancePacks.GetType().FullName -eq 'System.Management.Automation.PSCustomObject') { $InstancePacks = , @($InstancePacks) }
 	} while ($InstancePacks -and $InstancePacks.Count -and ($MaxDistance -eq 0 -or $DepthCounter -le $MaxDistance))
 	$FoundInstances
 }
