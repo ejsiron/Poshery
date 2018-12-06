@@ -52,6 +52,7 @@ PS C:\> Find-CimAssociatedInstance.ps1 -InputObject $VMHost -ResultClassName Msv
 On a Hyper-V host, loads the management operating system instance, then finds the paths of the first instance of Msvm_EthernetSwitchPortVlanSettingData within an association distance of 6. Avoids any branch containing "Msvm_ResourcePool/Msvm_VirtualEthernetSwitch" or "Msvm_InstalledEthernetSwitchExtension/Msvm_EthernetSwitchFeatureCapabilities".
 .LINK
 https://github.com/ejsiron/Poshery/blob/master/Docs/Find-CimAssociatedInstance.md
+.LINK
 Get-CimInstance: https://docs.microsoft.com/en-us/powershell/module/cimcmdlets/get-ciminstance
 #>
 [CmdletBinding()]
