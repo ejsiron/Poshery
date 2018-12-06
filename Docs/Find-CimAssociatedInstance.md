@@ -1,9 +1,5 @@
 # Get-CimDistantAssociation
 
-# DEPRECATED
-**Use [Find-CimAssociatedInstance](https://github.com/ejsiron/Poshery/blob/master/Docs/Find-CimAssociatedInstance.md) instead**
-This cmdlet will be removed in a future update of the Poshery script set.
-
 ## SYNOPSIS
 
 Traces CIM associations from the supplied instance, searching for an instance with the name specified in ResultClass.
