@@ -1,4 +1,4 @@
-# Get-CimDistantAssociation
+# Find-CimAssociatedInstance
 
 ## SYNOPSIS
 
@@ -7,7 +7,7 @@ Traces CIM associations from the supplied instance, searching for an instance wi
 ## SYNTAX
 
 ```PowerShell
-Get-CimDistantAssociation.ps1 [-CimInstance] <CimInstance>
+Find-CimAssociatedInstance.ps1 [-CimInstance] <CimInstance>
  [-ResultClassName] <String> [-MaxDistance <Int32>] [-MaxResults <Int32>]
  [-ExcludeBranches <String[]>] [-PathOnly]
  [-KeyOnly] [<CommonParameters>]
@@ -27,7 +27,7 @@ Due to the behavior of the native CIM cmdlets, searches proceed radially. They d
 
 ```PowerShell
 PS C:\> $VMHost = (Get-CimInstance -Namespace root/virtualization/v2 -ClassName Msvm_ComputerSystem)[0]
-PS C:\> Get-CimDistantAssociation.ps1 -CimInstance $VMHost -ResultClassName Msvm_EthernetSwitchPortVlanSettingData
+PS C:\> Find-CimAssociatedInstance.ps1 -CimInstance $VMHost -ResultClassName Msvm_EthernetSwitchPortVlanSettingData
 ```
 
 On a Hyper-V host, loads the management operating system instance, then finds all instances of Msvm_EthernetSwitchPortVlanSettingData within an association distance of 10 (the default).
@@ -36,7 +36,7 @@ On a Hyper-V host, loads the management operating system instance, then finds al
 
 ```PowerShell
 PS C:\> $VMHost = (Get-CimInstance -Namespace root/virtualization/v2 -ClassName Msvm_ComputerSystem)[0]
-PS C:\> Get-CimDistantAssociation.ps1 -CimInstance $VMHost -ResultClassName Msvm_EthernetSwitchPortVlanSettingData -MaxDistance 6
+PS C:\> Find-CimAssociatedInstance.ps1 -CimInstance $VMHost -ResultClassName Msvm_EthernetSwitchPortVlanSettingData -MaxDistance 6
 ```
 
 On a Hyper-V host, loads the management operating system instance, then finds all instances of Msvm_EthernetSwitchPortVlanSettingData within an association distance of 6.
@@ -45,7 +45,7 @@ On a Hyper-V host, loads the management operating system instance, then finds al
 
 ```PowerShell
 PS C:\> $VMHost = (Get-CimInstance -Namespace root/virtualization/v2 -ClassName Msvm_ComputerSystem)[0]
-PS C:\> Get-CimDistantAssociation.ps1 -CimInstance $VMHost -ResultClassName Msvm_EthernetSwitchPortVlanSettingData -MaxDistance 6 -ExcludeBranches 'Msvm_ResourcePool' -PathOnly
+PS C:\> Find-CimAssociatedInstance.ps1 -CimInstance $VMHost -ResultClassName Msvm_EthernetSwitchPortVlanSettingData -MaxDistance 6 -ExcludeBranches 'Msvm_ResourcePool' -PathOnly
 ```
 
 On a Hyper-V host, loads the management operating system instance, then finds the paths of all instances of Msvm_EthernetSwitchPortVlanSettingData within an association distance of 6. Avoids any branch containing an instance named "Msvm_ResourcePool".
@@ -54,7 +54,7 @@ On a Hyper-V host, loads the management operating system instance, then finds th
 
 ```PowerShell
 PS C:\> $VMHost = (Get-CimInstance -Namespace root/virtualization/v2 -ClassName Msvm_ComputerSystem)[0]
-PS C:\> Get-CimDistantAssociation.ps1 -CimInstance $VMHost -ResultClassName Msvm_EthernetSwitchPortVlanSettingData -MaxDistance 6 -ExcludeBranches 'Msvm_ResourcePool/Msvm_VirtualEthernetSwitch', 'Msvm_InstalledEthernetSwitchExtension/Msvm_EthernetSwitchFeatureCapabilities' -PathOnly -MaximumResults 1
+PS C:\> Find-CimAssociatedInstance.ps1 -CimInstance $VMHost -ResultClassName Msvm_EthernetSwitchPortVlanSettingData -MaxDistance 6 -ExcludeBranches 'Msvm_ResourcePool/Msvm_VirtualEthernetSwitch', 'Msvm_InstalledEthernetSwitchExtension/Msvm_EthernetSwitchFeatureCapabilities' -PathOnly -MaximumResults 1
 ```
 
 On a Hyper-V host, loads the management operating system instance, then finds the paths of the first instance of Msvm_EthernetSwitchPortVlanSettingData within an association distance of 6. Avoids any branch containing "Msvm_ResourcePool/Msvm_VirtualEthernetSwitch" or "Msvm_InstalledEthernetSwitchExtension/Msvm_EthernetSwitchFeatureCapabilities".
