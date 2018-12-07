@@ -61,7 +61,7 @@ On a Hyper-V host, loads the management operating system instance, then finds th
 
 ## REQUIRED PARAMETERS
 
-### -CimInstance
+### -InputObject
 
 The CIM instance that serves as the source for the search.
 
