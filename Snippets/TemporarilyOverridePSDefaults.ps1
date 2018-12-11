@@ -1,3 +1,6 @@
+<#
+Use this stub to override the global $PSDefaultParameterValues for the duration of your script.
+#>
 begin
 {
 	$ExistingDefaultParams = $PSDefaultParameterValues.Clone()
@@ -9,7 +12,7 @@ process
 }
 end
 {
-	# do other cleanup stuff
+	# do other cleanup stuff; DO NOT THROW UNCAUGHT EXCEPTIONS
 	$PSDefaultParameterValues.Clear()
 	foreach ($ParamKey in $ExistingDefaultParams.Keys)
 	{
