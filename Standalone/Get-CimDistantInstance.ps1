@@ -27,9 +27,9 @@ PS C:\> $VMHost = (Get-CimInstance -Namespace root/virtualization/v2 -ClassName 
 PS C:\> $VMHost | Get-CimDistantInstance.ps1 -PathToInstance 'Msvm_LANEndpoint/Msvm_LANEndpoint/Msvm_EthernetSwitchPort'
 On a Hyper-V host, loads the management operating system instance, then walks the indicated path to find all related instances of Msvm_EthernetSwitchPort.
 .LINK
-https://github.com/ejsiron/Poshery/blob/master/Docs/Get-CimDistantInstance.md
+https://github.com/ejsiron/Poshery/blob/master/docs/Get-CimDistantInstance.md
 .LINK
-Find-CimAssociatedInstance: https://github.com/ejsiron/Poshery/blob/master/Docs/Find-CimAssociatedInstance.md
+Find-CimAssociatedInstance: https://github.com/ejsiron/Poshery/blob/master/docs/Find-CimAssociatedInstance.md
 #>
 [CmdletBinding()]
 [OutputType([Microsoft.Management.Infrastructure.CimInstance[]])]

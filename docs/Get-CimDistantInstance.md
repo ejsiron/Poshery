@@ -105,4 +105,4 @@ Released under MIT license
 
 ## RELATED LINKS
 - [Get-CimInstance](https://docs.microsoft.com/en-us/powershell/module/cimcmdlets/get-ciminstance)
-- [Find-CimAssociatedInstance](https://github.com/ejsiron/Poshery/blob/master/Docs/Find-CimAssociatedInstance.md)
+- [Find-CimAssociatedInstance](https://github.com/ejsiron/Poshery/blob/master/docs/Find-CimAssociatedInstance.md)
