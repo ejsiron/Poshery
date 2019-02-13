@@ -17,7 +17,7 @@ Grants delegation in Active Directory to a system running Windows Admin Center s
 Grants delegation in Active Directory to a system running Windows Admin Center so that it can pass credentials to the destination system(s).
 In some cases, this will reduce the need to continually re-enter credentials when using Windows Admin Center.
 
-## EXAMPLE
+## EXAMPLES
 
 ### Example 1: One target, WAC server specified
 
@@ -65,6 +65,8 @@ Default value: None
 Accept pipeline input: True (ByValue, ByPropertyName)
 Accept wildcard characters: false
 ```
+
+## OPTIONAL PARAMETERS
 
 ### WACComputerName
 
