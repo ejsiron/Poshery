@@ -17,7 +17,7 @@ If set, will only retrieve the key properties of the final instance(s).
 The character that -PathToInstance uses as a delimiter. Defaults to /
 .NOTES
 Author: Eric Siron
-Version 1.0, December 12, 2018
+Version 1.1, February 13, 2019
 Released under MIT license
 .INPUTS
 Microsoft.Management.Infrastructure.CimInstance[]
@@ -27,9 +27,9 @@ PS C:\> $VMHost = (Get-CimInstance -Namespace root/virtualization/v2 -ClassName 
 PS C:\> $VMHost | Get-CimDistantInstance.ps1 -PathToInstance 'Msvm_LANEndpoint/Msvm_LANEndpoint/Msvm_EthernetSwitchPort'
 On a Hyper-V host, loads the management operating system instance, then walks the indicated path to find all related instances of Msvm_EthernetSwitchPort.
 .LINK
-https://github.com/ejsiron/Poshery/blob/master/docs/Get-CimDistantInstance.md
+https://ejsiron.github.io/Poshery/Get-CimDistantInstance
 .LINK
-Find-CimAssociatedInstance: https://github.com/ejsiron/Poshery/blob/master/docs/Find-CimAssociatedInstance.md
+Find-CimAssociatedInstance: https://ejsiron.github.io/Poshery/Find-CimAssociatedInstance
 #>
 [CmdletBinding()]
 [OutputType([Microsoft.Management.Infrastructure.CimInstance[]])]

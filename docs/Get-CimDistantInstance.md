@@ -104,5 +104,6 @@ First published December 12, 2018
 Released under MIT license
 
 ## RELATED LINKS
+
 - [Get-CimInstance](https://docs.microsoft.com/en-us/powershell/module/cimcmdlets/get-ciminstance)
 - [Find-CimAssociatedInstance](https://github.com/ejsiron/Poshery/blob/master/docs/Find-CimAssociatedInstance.md)

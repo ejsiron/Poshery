@@ -29,7 +29,7 @@ Results are displayed in the format "SourceClassName/FirstAssociation/SecondAsso
 Only retrieve values for key properties. No effect if PathOnly is also specified.
 .NOTES
 Author: Eric Siron
-Version 1.0, November 30, 2018
+Version 1.1, February 13, 2019
 Released under MIT license
 .INPUTS
 Microsoft.Management.Infrastructure.CimInstance[]
@@ -51,7 +51,7 @@ PS C:\> $VMHost = (Get-CimInstance -Namespace root/virtualization/v2 -ClassName 
 PS C:\> Find-CimAssociatedInstance.ps1 -InputObject $VMHost -ResultClassName Msvm_EthernetSwitchPortVlanSettingData -MaxDistance 6 -ExcludeBranches 'Msvm_ResourcePool/Msvm_VirtualEthernetSwitch', 'Msvm_InstalledEthernetSwitchExtension/Msvm_EthernetSwitchFeatureCapabilities' -PathOnly -MaxResults 1
 On a Hyper-V host, loads the management operating system instance, then finds the paths of the first instance of Msvm_EthernetSwitchPortVlanSettingData within an association distance of 6. Avoids any branch containing "Msvm_ResourcePool/Msvm_VirtualEthernetSwitch" or "Msvm_InstalledEthernetSwitchExtension/Msvm_EthernetSwitchFeatureCapabilities".
 .LINK
-https://github.com/ejsiron/Poshery/blob/master/docs/Find-CimAssociatedInstance.md
+https://ejsiron.github.io/Poshery/Find-CimAssociatedInstance
 .LINK
 Get-CimInstance: https://docs.microsoft.com/en-us/powershell/module/cimcmdlets/get-ciminstance
 #>
