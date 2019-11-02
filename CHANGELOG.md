@@ -6,6 +6,14 @@ This file contains a log of changes made to the individual scripts.
 
 History for Get-ExeTargetMachine
 
+### 2.0
+
+* **Breaking change**: All parameters except *Path* removed
+* **Breaking change**: Outputs a custom object for each file, see help
+* **Breaking change**: Access errors use the error stream as usual. All format errors and warnings written into the output object. Use a Where filter to pare down the results (see help)
+* Online help added
+* Comment-based help corrections
+
 ### 1.0.2
 
 * Moved to GitHub for versioning
