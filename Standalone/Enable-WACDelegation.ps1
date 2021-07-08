@@ -13,10 +13,10 @@
     Override the local check for a WAC gateway.
 .EXAMPLE
 	PS C:\> Enable-WACDelegation -ComputerName svtarget -WACComputerName svwac
-	Enables the system named "svwac" to delegate to "hc-target"
+	Enables the system named "svwac" to delegate to "svtarget"
 .EXAMPLE
 	PS C:\> Enable-WACDelegation svtarget svwac
-	Enables the system named "svwac" to delegate to "hc-target"
+	Enables the system named "svwac" to delegate to "svtarget"
 .EXAMPLE
 	PS C:\> Enable-WACDelegation svtarget1, svtarget2 svwac
     Enables the system named "svwac" to delegate to both "svtarget1" and "svtarget2"
