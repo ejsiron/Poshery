@@ -6,63 +6,58 @@
 	Displays the target machine type of any Windows executable file (.exe or .dll).
 	The expected usage is to determine if an executable is 32- or 64-bit, in which case it will return "x86" or "x64", respectively.
 	However, it will detect all machine types that were known as of the date of this script was authored.
-	
+
 .PARAMETER Path
 	A string that contains the path to the file to be checked. Can be relative or absolute.
 
 .LINK
 	https://ejsiron.github.io/Poshery/Get-ExeTargetMachine
 	http://msdn.microsoft.com/en-us/windows/hardware/gg463119.aspx
-	
+
 .OUTPUTS
 	ExeInfo object with the members:
 	-- TargetMachine [String]: file's target machine
 	-- Path [String]: path to the file
 	-- IsValid [Boolean]: if the file is a executable valid type
 
-.NOTES
-   Author: Eric Siron
-   Version 2.0, November 1, 2019
-   Released under MIT license
-
 .EXAMPLE
 	PS C:\> C:\Scripts\Get-ExeTargetMachine.ps1 C:\Windows\bfsvc.exe
-	
+
 	Description
 	-----------
 	Returns the file name and a target machine of x64 (on a 64-bit system)
 
 .EXAMPLE
 	PS C:\> C:\Scripts\Get-ExeTargetMachine.ps1 C:\Windows\winhlp32.exe
-	
+
 	Description
 	-----------
 	Returns the file name and a target machine of x86
 
 .EXAMPLE
 	PS C:\> Get-ChildItem 'C:\Program Files (x86)\*.exe' -Recurse | C:\Scripts\Get-ExeTargetMachine.ps1
-	
+
 	Description
 	-----------
 	Returns the path and target machine of all EXE files under C:\Program Files (x86) and all subfolders
 
 .EXAMPLE
 	PS C:\> Get-ChildItem 'C:\Program Files\*.exe' -Recurse | C:\Scripts\Get-ExeTargetMachine.ps1 | where { $_.TargetMachine -ne 'x64' }
-	
+
 	Description
 	-----------
 	Returns the path and target machine of all EXE files under C:\Program Files and all subfolders that are not 64-bit (x64)
 
 .EXAMPLE
 	PS C:\> Get-ChildItem 'C:\windows\*.exe' -Recurse | C:\Scripts\Get-ExeTargetMachine.ps1 | where { $_.TargetMachine -eq '' }
-	
+
 	Description
 	-----------
 	Gets information only for the EXE files of unknown type under C:\Windows and subfolders. This can be used to find 16-bit and other EXEs that don't conform to the portable executable standard
-	
+
 .EXAMPLE
 	PS C:\> Get-ChildItem 'C:\Program Files\' -Recurse | C:\Scripts\Get-ExeTargetMachine.ps1 | Out-GridView
-	
+
 	Description
 	-----------
 	Finds every file in C:\Program Files and subfolders with a portable executable header, regardless of extension, and displays their names and Target Machine in a grid view
@@ -101,7 +96,7 @@ BEGIN
 			else
 			{
 				$this.TargetMachine = $TargetMachine
-				$this.IsValid = $true	
+				$this.IsValid = $true
 			}
 		}
 	}
@@ -116,10 +111,10 @@ PROCESS
 		$PEHeaderOffset = New-Object Byte[] $PEHeaderOffsetLocationNumBytes
 		$PESignature = New-Object Byte[] $PESignatureNumBytes
 		$MachineType = New-Object Byte[] $MachineTypeNumBytes
-			
+
 		Write-Verbose -Message ('Opening {0} for reading.' -f $Path)
 		$FileStream = New-Object System.IO.FileStream($Path, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read, [System.IO.FileShare]::ReadWrite)
-			
+
 		Write-Verbose -Message 'Moving to the header location expected to contain the location of the PE (portable executable) header.'
 		$FileStream.Position = $PEHeaderOffsetLocation
 		$BytesRead = $FileStream.Read($PEHeaderOffset, 0, $PEHeaderOffsetLocationNumBytes)
@@ -171,14 +166,19 @@ PROCESS
 		$TargetMachine = switch ($RawMachineType)
 		{
 			0x0 { 'Unknown/Any' }
+			0x184 { 'Alpha AXP, 32-bit address space'}
+			0x284 { 'Alpha AXP, 64-bit address space'}
 			0x1d3 { 'Matsushita AM33' }
 			0x8664	{ 'x64' }
 			0x1c0 { 'ARM little endian' }
 			0xaa64	{ 'ARM64 little endian' }
 			0x1c4 { 'ARM Thumb-2 little endian' }
+			0x284 { 'AXP 64 (Same as Alpha 64)'}
 			0xebc { 'EFI byte code' }
 			0x14c { 'x86' }
 			0x200 { 'Intel Itanium 64 bit' }
+			0x6232 { 'LoongArch 32-bit processor family' }
+			0x6264 { 'LoongArch 64-bit processor family' }
 			0x9041	{ 'Mitsubishi M32R little endian' }
 			0x266 { 'MIPS16' }
 			0x366 { 'MIPS with FPU' }
