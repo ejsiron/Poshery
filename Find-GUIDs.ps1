@@ -120,8 +120,6 @@ process
 	$GUIDsInThisFile = New-Object -TypeName 'System.Collections.Generic.Dictionary`2[[System.Guid], [GuidInfo]]'
 	$CharBuffer = New-Object -TypeName 'char[]' -ArgumentList $StreamBlockSize
 	$ProcessSB = New-Object -TypeName 'System.Text.StringBuilder'
-	#$WhitespaceTracker = New-Object -TypeName 'System.Collections.ArrayList'
-	$FileIndex = 0
 
 	$ReaderStream = New-Object -TypeName System.IO.StreamReader -ArgumentList $StreamReaderParameters
 	while ($BytesRead = $ReaderStream.Read($CharBuffer, 0, $StreamBlockSize))
@@ -163,36 +161,21 @@ process
 				$GUIDsInThisFile[$ThisGUID] = [GUIDInfo]::new()
 				$GUIDsInThisFile[$ThisGUID].GUID = $ThisGUID
 			}
-			$GUIDsInThisFile[$ThisGUID].GUID = $ThisGUID
 			$GUIDsInThisFile[$ThisGUID].Count++
 		}
+		$ProcessSB.Clear() | Out-Null
+		$LastUsedCharOffset = 0
+		if ($GUIDMatches.Count)
+		{
+			$LastUsedCharOffset = $GUIDMatches[($GUIDMatches.Count - 1)].Groups[4].Captures[5].Index + $GUIDMatches[($GUIDMatches.Count - 1)].Groups[4].Captures[5].Length
+		}
+		if ($ProcessString.Length - $LastUsedCharOffset -gt $PreviousBlockCarryOverMaxChars)
+		{
+			$LastUsedCharOffset = $ProcessString.Length - $PreviousBlockCarryOverMaxChars
+		}
+		$ProcessSB.Append($ProcessString.ToCharArray($LastUsedCharOffset, $ProcessString.Length - $LastUsedCharOffset)) | Out-Null
 	}
 	$GUIDsInThisFile.Values
-
-	# 	$WhitespaceBlockStart = -1
-	# 	$WhitespaceBlockCounter = 0
-	# 	for ($i = 0; $i -lt $BytesRead; $i++, $FileIndex++)
-	# 	{
-	# 		if ($CharBuffer[$i] -match '\s')
-	# 		{
-	# 			if ($WhitespaceBlockCounter -eq 0)
-	# 			{
-	# 				# starting a new block of whitespace
-	# 				$WhitespaceBlockStart = $FileIndex
-	# 			}
-	# 			$WhitespaceBlockCounter++
-	# 		}
-	# 		else
-	# 		{
-	# 			$ProcessSB.Append($CharBuffer[$i]) | Out-Null
-	# 			if ($WhitespaceBlockCounter -gt 0)
-	# 			{
-	# 				$WhitespaceTracker.Add(@{Start = $WhitespaceBlockStart; Length = $WhitespaceBlockCounter}) | Out-Null
-	# 				$WhitespaceBlockCounter = 0
-	# 			}
-	# 		}
-	# 	}
-	# }
 }
 
 end {Invoke-Command -ScriptBlock $CleanupBody}
