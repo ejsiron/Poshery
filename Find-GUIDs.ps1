@@ -90,14 +90,12 @@ begin
 	#		A864F394-C94E-4727-8EEB-[->89223E3096AF<-]										:Captures[0].Value through Captures[5].Value contains octet pairs in order
 	#		0xa864f394,0xc94e,0x4727,0x8e,0xeb,[->0x89,0x22,0x3e,0x30,0x96,0xaf<-]	:Captures[0].Value through Captures[5].Value contains octet pairs in order
 	$GuidMatcher = [System.Text.RegularExpressions.Regex]::New($GuidPattern, [System.Text.RegularExpressions.RegexOptions]::Compiled)
-	$WSMatcher = [System.Text.RegularExpressions.Regex]::New('\s+', [System.Text.RegularExpressions.RegexOptions]::Compiled)
+	$WSMatcher = [System.Text.RegularExpressions.Regex]::New('\s', [System.Text.RegularExpressions.RegexOptions]::Compiled)
 
 	class GUIDInfo
 	{
 		[Guid]$GUID
 		[int]$Count = 0
-		[int]$FileOffsetStart = 0
-		[int]$FileOffsetEnd = 0
 	}
 
 	$CleanupBody = {
@@ -105,30 +103,6 @@ begin
 		{
 			$ReaderStream.Close()
 		}
-	}
-
-	function CalculateOffsetMap([System.Text.RegularExpressions.MatchCollection]$WSData, [int]$OffsetStart)
-	{
-		$OffsetMap = @()
-		$AccumulatedCharCount = 0
-		$AccumulatedWSCount = 0
-		$LastWSEndPos = 0
-		foreach ($WSBlock in $WSData)
-		{
-			if ($WSBlock.Index -ne 0)
-			{
-				$AccumulatedCharCount += $WSBlock.Index - $LastWSEndPos
-				$OffsetMap += @{
-					Start          = $WSBlock.Index - $AccumulatedWSCount - $AccumulatedCharCount;
-					End            = $WSBlock.Index - 1;
-					OriginalOffset = $OffsetStart + ($WSBlock.Index - $LastWSEndPos);
-				}
-				$TrimmedOffset += $WSBlock.Length
-			}
-			$LastWSEndPos += $WSBlock.Index + $WSBlock.Length
-			$AccumulatedWSCount += $WSBlock.Length
-		}
-		$OffsetMap
 	}
 }
 
@@ -147,15 +121,11 @@ process
 	$GUIDsInThisFile = New-Object -TypeName 'System.Collections.Generic.Dictionary`2[[System.Guid], [GuidInfo]]'
 	$CharBuffer = New-Object -TypeName 'char[]' -ArgumentList $StreamBlockSize
 	$ProcessSB = New-Object -TypeName 'System.Text.StringBuilder'
-	$OffsetStart = 0
 	$ReaderStream = New-Object -TypeName System.IO.StreamReader -ArgumentList $StreamReaderParameters
 	while ($CharsRead = $ReaderStream.Read($CharBuffer, 0, $StreamBlockSize))
 	{
 		$ProcessSB.Append($CharBuffer, 0, $CharsRead) | Out-Null
-		$ProcessString = $ProcessSB.ToString()
-		$WSData = $WSMatcher.Matches($ProcessString)
-		$OffsetMap = CalculateOffsetMap -WSData $WSData -OffsetStart $OffsetStart
-		$ProcessString = $WSMatcher.Replace($ProcessString, '')
+		$ProcessString = $WSMatcher.Replace($ProcessSB.ToString(), '')
 		$GUIDMatches = $GuidMatcher.Matches($ProcessString)
 		:GUIDWalker foreach ($FoundGUID in $GUIDMatches)
 		{
@@ -192,13 +162,6 @@ process
 				$GUIDsInThisFile[$ThisGUID].GUID = $ThisGUID
 			}
 			$GUIDsInThisFile[$ThisGUID].Count++
-			Write-Output ('Looking for {0}' -f $FoundGUID.Index)
-			#$OffsetMap.Where({($FoundGUID.Index -ge $_.Start) -and ($FoundGUID.Index -le $_.End)})
-			$OffsetMap | % { 'Start:	{0}; End:	{1}; Offset:	{2}' -f $_.Start, $_.End, $_.Offset}
-			exit
-			$GUIDsInThisFile[$ThisGUID].FileOffsetStart = $OffsetMap.Where({($_.Start -le $FoundGUID.Index) -and ($_.End -ge $FoundGUID.Index)})[0].Offset + $FoundGUID.Index
-			$LastGUIDCharPos = $FoundGUID.Groups[4].Captures[5].Index + $FoundGUID.Groups[4].Captures[5].Length
-			$GUIDsInThisFile[$ThisGUID].FileOffsetEnd = $OffsetMap.Where({($_.Start -le $LastGUIDCharPos) -and ($_.End -ge $LastGUIDCharPos)})[0].Offset + $LastGUIDCharPos
 		}
 		$ProcessSB.Clear() | Out-Null
 		$LastUsedCharOffset = 0
@@ -211,9 +174,6 @@ process
 			$LastUsedCharOffset = $ProcessString.Length - $PreviousBlockCarryOverMaxChars
 		}
 		$ProcessSB.Append($ProcessString.ToCharArray($LastUsedCharOffset, $ProcessString.Length - $LastUsedCharOffset)) | Out-Null
-		$OffsetStart += $CharsRead - $ProcessSB.Length # for the next round
-		#$OffsetMap
-		#$ProcessString.Length
 	}
 	$ReaderStream.BaseStream.Position
 	$GUIDsInThisFile.Values
