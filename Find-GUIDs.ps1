@@ -175,7 +175,6 @@ process
 		}
 		$ProcessSB.Append($ProcessString.ToCharArray($LastUsedCharOffset, $ProcessString.Length - $LastUsedCharOffset)) | Out-Null
 	}
-	$ReaderStream.BaseStream.Position
 	$GUIDsInThisFile.Values
 
 }
