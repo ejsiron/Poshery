@@ -17,6 +17,6 @@ begin
 
 process
 {
-    # use $Path
+    # place code for your use of $Path here
 }
 end {}
