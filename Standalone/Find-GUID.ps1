@@ -1,3 +1,28 @@
+<#
+.SYNOPSIS
+	Find GUIDs (UUIDs) in a file.
+.DESCRIPTION
+	Find GUIDs (UUIDs) in a file. This script returns a list of GUIDs found in the file along with the number of times each GUID was found.
+	It can find text-encoded GUIDs inside non-text encoded files although you may need to override the Encoding parameter.
+.PARAMETER Path
+	The path to the file to scan for GUIDs.
+.PARAMETER StreamBlockSize
+	The size of the block of characters to read from the file at a time. The default is 65,536. This parameter is used to control memory usage. When increasing this value, be aware that it measures characters, not bytes.
+.PARAMETER Encoding
+	The encoding of the file. The default is AutoDetect. The other options are ASCII, Unicode, UTF32, UTF7, and UTF8. Autodetect should work for typical text-encoded files.
+.EXAMPLE
+	Find-GUID -Path 'C:\Temp\MyFile.txt'
+	Find GUID in the file C:\Temp\MyFile.txt.
+.EXAMPLE
+	Find-GUID -Path 'C:\Temp\MyFile.txt' -StreamBlockSize 128KB
+	Find GUID in the file C:\Temp\MyFile.txt, reading 131,072 characters at a time.
+.NOTES
+	Author: Eric Siron
+	Version 1.0, June 16, 2024
+	Released under MIT license
+.LINK
+	https://ejsiron.github.io/Poshery/Find-GUID
+#>
 [CmdletBinding()]
 param(
 	[Parameter(Mandatory = $true, Position = 1, ValueFromPipeline = $true)][String]$Path,
@@ -19,9 +44,9 @@ begin
 	$ErrorActionPreference = 'Stop'
 	Set-StrictMode -Version Latest
 
-	# this is the maximum number of non-whitespace characters that can be carried over from the previous block
-	# this is to ensure that GUIDs that span block boundaries are not missed
-	# size chosen arbitrarily, but should be more than sufficient to capture any block-spanning GUID
+	# $PreviousBlockCarryOverMaxChars is the maximum number of non-whitespace characters that can be carried over from the previously-scanned block.
+	# It helps to ensure that GUIDs that span block boundaries are not missed. The size was chosen arbitrarily, but should be more than sufficient
+	# to capture any block-spanning GUID in a typical text-encoded file.
 	$PreviousBlockCarryOverMaxChars = 64
 	if ($PreviousBlockCarryOverMaxChars -ge $StreamBlockSize)
 	{
@@ -64,7 +89,6 @@ begin
 	# format 2: 0xa864f394,0xc94e,0x4727,0x8e,0xeb,0x89,0x22,0x3e,0x30,0x96,0xaf
 	# format 3: 0xa864f394,0xc94e,0x4727,{0x8e,0xeb,0x89,0x22,0x3e,0x30,0x96,0xaf}
 	# this pattern assumes all whitespace (including line breaks) have been removed from the sample text
-	# built-in PowerShell regex is insufficient (ex: -match); does not see all matches
 	#
 	# each match represents a found GUID in the text
 	# each match has 5 numbered groups. groups 2-4 have captures of their own
